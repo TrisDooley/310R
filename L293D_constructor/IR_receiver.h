@@ -1,14 +1,15 @@
 #pragma once
 #include <IRremote.h>
+#define FWD_CMD 10
+#define BCK_CMD 11
+#define RIGHT_CMD 12
+#define LEFT_CMD 13
+
+#define RAISE_CMD 14
+#define LOWER_CMD 15
 
 class IR_receiver{
   private:
-  int fwd_code = 10;
-  int rev_code = 11;
-  int right_code = 12;
-  int left_code = 13;
-  int raise_code = 14;
-  int lower_code = 15;
 
   public:
     int cmd;
@@ -26,27 +27,35 @@ class IR_receiver{
     receiver.resume();
   }
 
-  double* getDriveSignal() {
-    if(cmd == fwd_code) {
-      return new double[2] {1, 0};
-    } else if(cmd == rev_code) {
-      return new double[2] {-1, 0};
-    } else if(cmd == right_code) {
-      return new double[2] {0, 1};
-    } else if(cmd == left_code) {
-      return new double[2] {0, -1};
-    } else {
-      return new double[2] {0, 0};
+  int* getDriveSignal() {
+    switch(cmd) {
+      case FWD_CMD:
+        return new int[2] {1, 0};
+        break;
+      case BCK_CMD:
+        return new int[2] {-1, 0};
+        break;
+      case RIGHT_CMD:
+        return new int[2] {0, 1};
+        break;
+      case LEFT_CMD:
+        return new int[2] {0, -1};
+        break;
+      default:
+        return new int[2] {0, 0};
     }
   }
 
   double getServoSignal() {
-    if(cmd == raise_code) {
-      return 0.8;
-    } else if(cmd == lower_code) {
-      return 0.2;
-    } else {
-      return 0.2;
+    switch(cmd) {
+      case RAISE_CMD:
+        return 0.8;
+        break;
+      case LOWER_CMD:
+        return 0.2;
+        break;
+      default:
+        return 0.2;
     }
   }
 };
