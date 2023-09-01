@@ -12,6 +12,7 @@ class Custom_servo {
   void init(int pin, int min_us, int max_us) {
     this->s=s;
     s.attach(pin, min_us, max_us);
+    Serial.print("servo setup");
   }
 
   void setPos(double pos){

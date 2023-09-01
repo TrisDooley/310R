@@ -4,17 +4,17 @@
 //
 
 int bckPin1 = 4;
-int fwdPin1 = 5;
-int spdPin1 = 6;
+int fwdPin1 = 2;
+int spdPin1 = 3;
 int bckPin2 = 7;
-int fwdPin2 = 8;
-int spdPin2 = 9;
-int rcv_pin = 2;
+int fwdPin2 = 5;
+int spdPin2 = 6;
+int rcv_pin = 13;
 int cmd;
 double fwd;
 double trn;
 int timeout = 200; //Motor timeout in millis
-int last_time;
+unsigned long last_time;
 double killed;
 double m1s;
 double m2s;
@@ -40,13 +40,15 @@ void loop()
     if(IrReceiver.decodedIRData.command != 0) {
       cmd = IrReceiver.decodedIRData.command;
     }
-    Serial.println(cmd);
+    // Serial.println(cmd);
     IrReceiver.resume();
     last_time = millis();
+    Serial.println(last_time);
   } else {
     if(millis() - last_time > timeout && !killed) {
       cmd = 0;
-      Serial.println("killed!");
+      Serial.println(millis() - last_time);
+      // Serial.println("killed!");
       killed = true;
     }
   }

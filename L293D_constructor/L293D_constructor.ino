@@ -11,18 +11,23 @@ Differential_Drive chassis;
 
 IR_receiver rc;
 
+unsigned long lastTime;
+
 void setup() {
-  m1.init(2, 3, 4);
-  m2.init(5, 6, 7);
+  m1.init(8, 9, 10);
+  m2.init(13, 12, 11);
   chassis.init(m1, m2);
 
   s1.init(9, 500, 2500);
 
-  rc.init(13);
+  rc.init(2);
+  Serial.begin(115200);
 }
 
 void loop() {
+  // Serial.println(1000.0/(millis()-lastTime));
+  lastTime = millis();
   rc.update();
-  chassis.drive(rc.getDriveSignal());
+  chassis.drive(rc.getFwdSignal(), rc.getTurnSignal());
   s1.setPos(rc.getServoSignal());
 }

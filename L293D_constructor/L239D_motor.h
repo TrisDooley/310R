@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 class L239D_motor {
   private: 
     int fwd_pin;
@@ -14,21 +15,22 @@ class L239D_motor {
     pinMode(fwd_pin, OUTPUT);
     pinMode(rev_pin, OUTPUT);
     pinMode(spd_pin, OUTPUT);
+    Serial.print("motor setup");
   }
 
   void setSpeed(double speed) {
     if(speed > 0) {
       digitalWrite(fwd_pin, HIGH);
       digitalWrite(rev_pin, LOW);
-      digitalWrite(spd_pin, speed*255);
+      analogWrite(spd_pin, speed*255);
     } else if(speed < 0) {
       digitalWrite(fwd_pin, LOW);
       digitalWrite(rev_pin, HIGH);
-      digitalWrite(spd_pin, speed*255);
+      analogWrite(spd_pin, abs(speed)*255);
     } else {
       digitalWrite(fwd_pin, LOW);
       digitalWrite(rev_pin, LOW);
-      digitalWrite(spd_pin, 0);
+      analogWrite(spd_pin, 0);
     }
   }
 };

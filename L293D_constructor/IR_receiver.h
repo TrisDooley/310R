@@ -1,48 +1,76 @@
 #pragma once
-#include <IRremote.h>
-#define FWD_CMD 10
-#define BCK_CMD 11
-#define RIGHT_CMD 12
-#define LEFT_CMD 13
+#include <IRremote.hpp>
+#include <Arduino.h>
 
-#define RAISE_CMD 14
-#define LOWER_CMD 15
+#define FWD_CMD 70
+#define BCK_CMD 82
+#define RIGHT_CMD 90
+#define LEFT_CMD 8
+#define RAISE_CMD 9
+#define LOWER_CMD 7
+
+#define DECODE_NEC
 
 class IR_receiver{
   private:
+    int timeout = 250; //max of 32000 before the in rolls-over
+    unsigned long last_command = 0;
+    boolean killed = false;
+    byte rcv_cmd;
+    byte dummy;
 
   public:
     int cmd;
-    IRrecv receiver;
+
   void init(int receiver_pin) {
-    IRrecv receiver(receiver_pin);
-    receiver.enableIRIn();
-    receiver.blink13(true);
+    IrReceiver.begin(receiver_pin, true);
+    Serial.println("IR setup");
   }
 
   void update() {
-    if(receiver.decode()) {
-      cmd = receiver.decodedIRData.command;
+    if(IrReceiver.decode()) {
+      Serial.println("decoding");
+      Serial.println(IrReceiver.decodedIRData.command);
+      if(IrReceiver.decodedIRData.command != 0){
+        cmd = IrReceiver.decodedIRData.command;
+      } else {
+        dummy = IrReceiver.decodedIRData.command;
+      }
+      IrReceiver.resume();
+      last_command = millis();
+      killed = false;
     }
-    receiver.resume();
+
+    if(millis()-last_command > timeout && !killed) {
+      killed = true;
+      cmd = 0;
+      Serial.println("killed!");
+    }
   }
 
-  int* getDriveSignal() {
+  int getFwdSignal() {
     switch(cmd) {
       case FWD_CMD:
-        return new int[2] {1, 0};
+        return 1;
         break;
       case BCK_CMD:
-        return new int[2] {-1, 0};
-        break;
-      case RIGHT_CMD:
-        return new int[2] {0, 1};
-        break;
-      case LEFT_CMD:
-        return new int[2] {0, -1};
+        return -1;
         break;
       default:
-        return new int[2] {0, 0};
+        return 0;
+    }
+  }
+
+  int getTurnSignal() {
+    switch(cmd) {
+      case RIGHT_CMD:
+        return 1;
+        break;
+      case LEFT_CMD:
+        return -1;
+        break;
+      default:
+        return 0;
     }
   }
 
